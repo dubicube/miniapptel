@@ -1,0 +1,7 @@
+/Debug/
+/Release/
+/_ide/
+.cproject
+.project
+*.prj
+Xilinx.spec

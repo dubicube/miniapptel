@@ -32,7 +32,7 @@ uint32_t* getActiveGBuffer() {
 }
 
 uint32_t* createGBuffer() {
-    return (uint32_t*)calloc(GBUFFER_SIZE);
+    return (uint32_t*)calloc(GBUFFER_SIZE, 1);
 }
 void destroyGBuffer(uint32_t* gbuffer) {
     free(gbuffer);
@@ -45,25 +45,55 @@ void refreshActiveBuffer(uint32_t* buffer) {
 
 void drawPixel(uint32_t* gbuffer, int x, int y, int value) {
     uint32_t v = Xil_In32((UINTPTR)gbuffer | (((x<<4)|(y>>5))<<2));
-    v = v&(~(1<<(y&0x1F)));
-    v = v | ((value&1)<<(y&0x1F));
+    if (value == 0) {
+        v = v&(~(1<<(y&0x1F)));
+    } else {
+        v = v | ((value&1)<<(y&0x1F));
+    }
     Xil_Out32((UINTPTR)gbuffer | (((x<<4)|(y>>5))<<2), v);
 }
 
-void drawFullRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value) {
-    for (int y = y0; y < y1; y++) {
-        for (int x = x0; x < x1; x++) {
-            drawPixel(gbuffer, x, y, value);
+void drawVLine(uint32_t* gbuffer, int x, int y0, int y1, int value) {
+    uint32_t v;
+    if (y0/32 == y1/32) {
+        v = Xil_In32((UINTPTR)gbuffer | (((x<<4)|(y0>>5))<<2));
+        if (value == 0) {
+            v = v & (((1<<(y0&0x1F))-1) | ~((1<<(y1&0x1F))-1));
+        } else {
+            v = v | ~(((1<<(y0&0x1F))-1) | ~((1<<(y1&0x1F))-1));
         }
+        Xil_Out32((UINTPTR)gbuffer | (((x<<4)|(y0>>5))<<2), v);
+    } else {
+        v = Xil_In32((UINTPTR)gbuffer | (((x<<4)|(y0>>5))<<2));
+        if (value == 0) {
+            v = v & ((1<<(y0&0x1F))-1);
+        } else {
+            v = v | ~((1<<(y0&0x1F))-1);
+        }
+        Xil_Out32((UINTPTR)gbuffer | (((x<<4)|(y0>>5))<<2), v);
+
+        memset((UINTPTR)gbuffer | (((x<<4)|((y0>>5)+1))<<2), value ? 0xFFFFFFFF : 0x00000000, ((y1>>5)-(y0>>5)-1)*sizeof(uint32_t));
+
+        v = Xil_In32((UINTPTR)gbuffer | (((x<<4)|(y1>>5))<<2));
+        if (value == 0) {
+            v = v & ~((1<<(y1&0x1F))-1);
+        } else {
+            v = v | ((1<<(y1&0x1F))-1);
+        }
+        Xil_Out32((UINTPTR)gbuffer | (((x<<4)|(y1>>5))<<2), v);
+    }
+}
+
+void drawFullRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value) {
+    for (int x = x0; x < x1; x++) {
+        drawVLine(gbuffer, x, y0, y1, value);
     }
 }
 
 void drawRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value) {
-    for (int y = y0; y < y1; y++) {
-        drawPixel(gbuffer, x0, y, value);
-        drawPixel(gbuffer, x1-1, y, value);
-    }
-    for (int x = x0; x < x1; x++) {
+    drawVLine(gbuffer, x0, y0, y1, value);
+    drawVLine(gbuffer, x1, y0, y1, value);
+    for (int x = x0+1; x < x1-1; x++) {
         drawPixel(gbuffer, x, y0, value);
         drawPixel(gbuffer, x, y1-1, value);
     }

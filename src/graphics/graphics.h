@@ -32,6 +32,7 @@ void destroyGBuffer(uint32_t* gbuffer);
 void refreshActiveBuffer(uint32_t* buffer);
 
 void drawPixel(uint32_t* gbuffer, int x, int y, int value);
+void drawVLine(uint32_t* gbuffer, int x, int y0, int y1, int value);
 void drawFullRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value);
 void drawRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value);
 void drawChar(uint8_t c);

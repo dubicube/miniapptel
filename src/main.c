@@ -89,6 +89,9 @@ int main() {
     int width = 20;
     int height = 10;
 
+    drawVLine(gbuffer, 200, 100, 120, 1);
+    drawVLine(gbuffer, 210, 100, 160, 1);
+
     while (1) {
 
         // Rectangle drawing and movement

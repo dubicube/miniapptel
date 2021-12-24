@@ -30,6 +30,9 @@
 
 #include "xscugic.h"
 
+#include "./graphics/graphics.h"
+
+
 // PL drives core0_nFIQ via VIO, ID = 28
 #define PL_INTERRUPT_ID 28LU
 
@@ -43,49 +46,8 @@ volatile static u32 CapturedInterrupt  = 0;
 static XScuGic gic;
 
 
-
-#define SCREEN_BASE_ADDR XPAR_BRAM_0_BASEADDR
 #define KEYBOARD_BASE_ADDR XPAR_KEYBOARD8X8_IP_0_BASEADDR
-#define SCREENCHAR_BASE_ADDR XPAR_CHAR_DRAWER_IP_0_BASEADDR
 
-
-#define SCREEN_WIDTH 768
-#define SCREEN_HEIGHT 512
-
-//void drawPixel(int x, int y, int value) {
-//    u32 v = Xil_In32(SCREEN_BASE_ADDR + (y*24+(x>>5))*4);
-//    v = v&(~(1<<(x&0x1F)));
-//    v = v | ((value&1)<<(x&0x1F));
-//    Xil_Out32(SCREEN_BASE_ADDR + (y*24+(x>>5))*4, v);
-//}
-void drawPixel(int x, int y, int value) {
-    u32 v = Xil_In32(SCREEN_BASE_ADDR | (((x<<4)|(y>>5))<<2));
-    v = v&(~(1<<(y&0x1F)));
-    v = v | ((value&1)<<(y&0x1F));
-    Xil_Out32(SCREEN_BASE_ADDR | (((x<<4)|(y>>5))<<2), v);
-}
-
-void drawFullRect(int x0, int y0, int x1, int y1, int value) {
-    for (int y = y0; y < y1; y++) {
-        for (int x = x0; x < x1; x++) {
-            drawPixel(x, y, value);
-        }
-    }
-}
-void drawRect(int x0, int y0, int x1, int y1, int value) {
-    for (int y = y0; y < y1; y++) {
-        drawPixel(x0, y, value);
-        drawPixel(x1-1, y, value);
-    }
-    for (int x = x0; x < x1; x++) {
-        drawPixel(x, y0, value);
-        drawPixel(x, y1-1, value);
-    }
-}
-
-void drawChar(u8 c) {
-    Xil_Out32(SCREENCHAR_BASE_ADDR, c);
-}
 
 u64 getKeyBoard() {
     u64 v = Xil_In32(KEYBOARD_BASE_ADDR);

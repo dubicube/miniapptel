@@ -24,11 +24,16 @@
 #define SCREEN_WIDTH 768
 #define SCREEN_HEIGHT 512
 
-uint32_t* getActiveBuffer();
+#define GBUFFER_SIZE ((SCREEN_WIDTH*SCREEN_HEIGHT/32)*sizeof(uint32_t))
 
-void drawPixel(uint32_t* buffer, int x, int y, int value);
-void drawFullRect(uint32_t* buffer, int x0, int y0, int x1, int y1, int value);
-void drawRect(uint32_t* buffer, int x0, int y0, int x1, int y1, int value);
+uint32_t* getActiveGBuffer();
+uint32_t* createGBuffer();
+void destroyGBuffer(uint32_t* gbuffer);
+void refreshActiveBuffer(uint32_t* buffer);
+
+void drawPixel(uint32_t* gbuffer, int x, int y, int value);
+void drawFullRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value);
+void drawRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value);
 void drawChar(uint8_t c);
 
 #endif

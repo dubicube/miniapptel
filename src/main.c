@@ -76,7 +76,8 @@ int main() {
 //    }
 //    xil_printf("Waiting for interrupt(s)...\r\n");
 
-    uint32_t* activeBuffer = getActiveBuffer();
+    // uint32_t* activeBuffer = getActiveGBuffer();
+    uint32_t* gbuffer = createGBuffer();
 
     drawChar(27);
     drawChar('[');
@@ -91,7 +92,7 @@ int main() {
     while (1) {
 
         // Rectangle drawing and movement
-        drawFullRect(activeBuffer, x, y, x+width, y+height, 0);
+        drawFullRect(gbuffer, x, y, x+width, y+height, 0);
         u64 k = getKeyBoard();
         if (!(k&0x0000000000000001)) {//Up arrow
             y--;
@@ -105,7 +106,8 @@ int main() {
         if (!(k&0x0000000000000040)) {//Right arrow
             x++;
         }
-        drawFullRect(activeBuffer, x, y, x+width, y+height, 1);
+        drawFullRect(gbuffer, x, y, x+width, y+height, 1);
+        refreshActiveBuffer(gbuffer);
 
         // Char FIFO to uart
         u32 c = getChar();
@@ -132,6 +134,8 @@ int main() {
         // Active sleeping
         usleep(10000);
     }
+
+    destroyGBuffer(gbuffer);
 
 
     cleanup_platform();

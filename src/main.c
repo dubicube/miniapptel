@@ -76,7 +76,7 @@ int main() {
 //    }
 //    xil_printf("Waiting for interrupt(s)...\r\n");
 
-
+    uint32_t* activeBuffer = getActiveBuffer();
 
     drawChar(27);
     drawChar('[');
@@ -91,7 +91,7 @@ int main() {
     while (1) {
 
         // Rectangle drawing and movement
-        drawFullRect(x, y, x+width, y+height, 0);
+        drawFullRect(activeBuffer, x, y, x+width, y+height, 0);
         u64 k = getKeyBoard();
         if (!(k&0x0000000000000001)) {//Up arrow
             y--;
@@ -105,7 +105,7 @@ int main() {
         if (!(k&0x0000000000000040)) {//Right arrow
             x++;
         }
-        drawFullRect(x, y, x+width, y+height, 1);
+        drawFullRect(activeBuffer, x, y, x+width, y+height, 1);
 
         // Char FIFO to uart
         u32 c = getChar();

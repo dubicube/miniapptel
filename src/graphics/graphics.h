@@ -5,7 +5,7 @@
 /*| |____/ |___||___||_||_|  |___||___||_|_|                                 |*/
 /*|                                                                          |*/
 /*|==========================================================================|*/
-/*| File name: graphivs.h                                                    |*/
+/*| File name: graphics.h                                                    |*/
 /*|                                                                          |*/
 /*| Description:                                                             |*/
 /*|                                                                          |*/
@@ -24,9 +24,11 @@
 #define SCREEN_WIDTH 768
 #define SCREEN_HEIGHT 512
 
-void drawPixel(int x, int y, int value);
-void drawFullRect(int x0, int y0, int x1, int y1, int value);
-void drawRect(int x0, int y0, int x1, int y1, int value);
+uint32_t* getActiveBuffer();
+
+void drawPixel(uint32_t* buffer, int x, int y, int value);
+void drawFullRect(uint32_t* buffer, int x0, int y0, int x1, int y1, int value);
+void drawRect(uint32_t* buffer, int x0, int y0, int x1, int y1, int value);
 void drawChar(uint8_t c);
 
 #endif

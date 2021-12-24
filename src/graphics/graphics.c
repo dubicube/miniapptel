@@ -72,7 +72,11 @@ void drawVLine(uint32_t* gbuffer, int x, int y0, int y1, int value) {
         }
         Xil_Out32((UINTPTR)gbuffer | (((x<<4)|(y0>>5))<<2), v);
 
-        memset((UINTPTR)gbuffer | (((x<<4)|((y0>>5)+1))<<2), value ? 0xFFFFFFFF : 0x00000000, ((y1>>5)-(y0>>5)-1)*sizeof(uint32_t));
+        memset(
+            (UINTPTR)gbuffer | (((x<<4)|((y0>>5)+1))<<2),
+            value ? 0xFFFFFFFF : 0x00000000,
+            ((y1>>5)-(y0>>5)-1)*sizeof(uint32_t)
+        );
 
         v = Xil_In32((UINTPTR)gbuffer | (((x<<4)|(y1>>5))<<2));
         if (value == 0) {

@@ -85,57 +85,54 @@ int main() {
     drawChar('C');
 
     int x = 100;
-    int y = 100;
+    int y = 256;
     int width = 20;
     int height = 10;
+    int a = 1;
+    int b = 1;
 
-    drawVLine(gbuffer, 200, 100, 120, 1);
-    drawVLine(gbuffer, 210, 100, 160, 1);
+
+    char str[] = "AZRGRZFERHETRHTE";
+    uint8_t i;
+    i = 0;
+    while(str[i]) {
+        drawChar2B(gbuffer, 205 + 6*i, 100, 1, str[i]);
+        drawChar2B(gbuffer, 205 + 12*i, 100+8, 2, str[i]);
+        drawChar2B(gbuffer, 205 + 18*i, 100+8+16, 3, str[i]);
+        drawChar2B(gbuffer, 205 + 24*i, 100+8+16+24, 4, str[i]);
+        i++;
+    }
+
+    // drawVLine(gbuffer, 200, 100, 120, 1);
+    // drawVLine(gbuffer, 210, 100, 160, 1);
 
     while (1) {
 
         // Rectangle drawing and movement
         drawFullRect(gbuffer, x, y, x+width, y+height, 0);
-        u64 k = getKeyBoard();
-        if (!(k&0x0000000000000001)) {//Up arrow
-            y--;
+        x+=a;
+        y+=b;
+        if (x+width >= SCREEN_WIDTH) {
+            x = SCREEN_WIDTH - width;
+            a = -a;
         }
-        if (!(k&0x0000000000000008)) {//Down arrow
-            y++;
+        if (x < 0) {
+            x = 0;
+            a = -a;
         }
-        if (!(k&0x0000000000000020)) {//Left arrow
-            x--;
+        if (y+height >= SCREEN_HEIGHT) {
+            y = SCREEN_HEIGHT - height;
+            b = -b;
         }
-        if (!(k&0x0000000000000040)) {//Right arrow
-            x++;
+        if (y < 256) {
+            y = 256;
+            b = -b;
         }
         drawFullRect(gbuffer, x, y, x+width, y+height, 1);
         refreshActiveBuffer(gbuffer);
 
-        // Char FIFO to uart
-        u32 c = getChar();
-        while (!(c&0x100)) {
-            outbyte(c&0xFF);
-            if(c == 13) {
-                drawChar(10);
-                drawChar(13);
-                drawChar(27);
-                drawChar('[');
-                drawChar('7');
-                drawChar('C');
-            } else {
-                drawChar(c);
-            }
-            c = getChar();
-        }
-
-//        if(FiqFlag) {
-//            xil_printf("Received interrupt %d\r\n", CapturedInterrupt);
-//            FiqFlag = FALSE; CapturedInterrupt = 0;
-//        }
-
         // Active sleeping
-        usleep(10000);
+        usleep(1000);
     }
 
     destroyGBuffer(gbuffer);

@@ -65,8 +65,21 @@ void drawFullRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value);
 // x1 et y1 are not included
 void drawRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value);
 
-// Draw to active gbuffer in char mode.
+// Draw to active gbuffer in char mode. It kinda works like a terminal.
 // Some ANSI escape sequences are supported (to move the cursor for example).
+// Not easy to use, but highly time-efficient on processor side,
+// because char drawing is done in custom prgogrammable logic.
+// Chars are drawn a 64x32 grid.
+// Each char is drawn with a pixel grid of 12x16, but elementary points are
+// actually 4 pixels:
+// Chars are graphically defined in a 6x8 pixel grid, but drawn
+// in a 12x16 pixel grid on the sceen.
 void drawChar(uint8_t c);
+
+// Draw char to gbuffer.
+// Drawing is done on processor side, thus it is much slower than drawChar().
+// "x", "y" are the top-left (included) pixel coordinates of the char to draw.
+// "c" is the char to draw, and "size" is the drawing size.
+void drawChar2B(uint32_t* gbuffer, int x, int y, int size, uint8_t c);
 
 #endif

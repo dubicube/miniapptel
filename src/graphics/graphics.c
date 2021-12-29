@@ -17,6 +17,8 @@
 
 #include "graphics.h"
 
+#include "font.h"
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -48,7 +50,7 @@ void drawPixel(uint32_t* gbuffer, int x, int y, int value) {
     if (value == 0) {
         v = v&(~(1<<(y&0x1F)));
     } else {
-        v = v | ((value&1)<<(y&0x1F));
+        v = v | (1<<(y&0x1F));
     }
     Xil_Out32((UINTPTR)gbuffer | (((x<<4)|(y>>5))<<2), v);
 }
@@ -105,4 +107,23 @@ void drawRect(uint32_t* gbuffer, int x0, int y0, int x1, int y1, int value) {
 
 void drawChar(uint8_t c) {
     Xil_Out32(SCREENCHAR_BASE_ADDR, c);
+}
+
+// Light implementation
+// void drawChar2B(uint32_t* gbuffer, int x, int y, int size, uint8_t c) {
+//     y = y >> 5;
+//     for (int i = 0; i < 5; i++) {
+//         Xil_Out32((UINTPTR)gbuffer | ((((x+i)<<4)|y)<<2), fontDataTable[c*5 + i]);
+//     }
+// }
+
+// Full implementation
+void drawChar2B(uint32_t* gbuffer, int x, int y, int size, uint8_t c) {
+    int slice = 0;
+    for (int i = 0; i < 5*size; i++) {
+        slice = i/size;
+        for (int j = 0; j < 8*size; j++) {
+            drawPixel(gbuffer, x+i, y+j, fontDataTable[c*5+slice]&(1<<(j/size)));
+        }
+    }
 }

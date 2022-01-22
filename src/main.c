@@ -46,7 +46,7 @@ volatile static u32 CapturedInterrupt  = 0;
 static XScuGic gic;
 
 
-#define KEYBOARD_BASE_ADDR XPAR_KEYBOARD8X8_IP_0_BASEADDR
+#define KEYBOARD_BASE_ADDR (XPAR_BRAM_0_BASEADDR + 0x0200000000)
 
 
 u64 getKeyBoard() {
@@ -105,6 +105,9 @@ int main() {
 
     // drawVLine(gbuffer, 200, 100, 120, 1);
     // drawVLine(gbuffer, 210, 100, 160, 1);
+
+    refreshActiveBuffer(gbuffer);
+    while (1);
 
     while (1) {
 
